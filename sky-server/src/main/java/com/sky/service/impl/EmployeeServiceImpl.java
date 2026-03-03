@@ -1,26 +1,23 @@
 package com.sky.service.impl;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.PasswordConstant;
 import com.sky.constant.StatusConstant;
 import com.sky.context.BaseContext;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
+import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
 import com.sky.exception.AccountLockedException;
 import com.sky.exception.AccountNotFoundException;
 import com.sky.exception.PasswordErrorException;
 import com.sky.mapper.EmployeeMapper;
+import com.sky.result.PageResult;
 import com.sky.service.EmployeeService;
-
-import ch.qos.logback.core.joran.util.beans.BeanUtil;
-
-import java.sql.Time;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.zip.DataFormatException;
-
-import org.apache.poi.ss.usermodel.DataFormatter;
+import java.util.List;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -70,21 +67,19 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employee;
     }
     public void addEmployee(EmployeeDTO employeeDTO){
-        System.out.println("当前线程id值为 "+Thread.currentThread().threadId());
+        System.out.println("当前线程id值为 "+Thread.currentThread().getId());
         Long lid = BaseContext.getCurrentId();
         Employee employee = new Employee();
         BeanUtils.copyProperties(employeeDTO,employee);
         employee.setStatus(StatusConstant.ENABLE);
-            //@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
         employee.setPassword(DigestUtils.md5DigestAsHex(PasswordConstant.DEFAULT_PASSWORD.getBytes()));
         LocalDateTime localDateTime = LocalDateTime.now();
-        DateTimeFormatter  dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         
-        employee.setCreateTime(localDateTime);
-        employee.setUpdateTime(localDateTime);
-        // TODO 后期需要更改
-        employee.setCreateUser(lid);
-        employee.setUpdateUser(lid);
+        // employee.setCreateTime(localDateTime);
+        // employee.setUpdateTime(localDateTime);
+        // // TODO 后期需要更改
+        // employee.setCreateUser(lid);
+        // employee.setUpdateUser(lid);
 
         employeeMapper.insert(employee);
 
@@ -92,5 +87,50 @@ public class EmployeeServiceImpl implements EmployeeService {
     
 
     }
+    @Override
+    public PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO) {
+        PageHelper.startPage(employeePageQueryDTO.getPage(), employeePageQueryDTO.getPageSize());
+        Page<Employee> page = employeeMapper.pageQuery(employeePageQueryDTO);
+        Long total = page.getTotal();
+        List<Employee> records = page.getResult();
+
+        return new PageResult(total,records);
+
+
+   
+    }
+    @Override
+    public void start_or_stop(Integer Status , Long id) {
+
+        Employee employee = Employee.builder()
+                .status(Status)
+                .id(id)
+                .build();
+
+
+
+        employeeMapper.update(employee);
+        
+    }
+    @Override
+    public Employee get_by_id(Long id) {
+
+        Employee employee = employeeMapper.get_by_id( id);
+        return employee;
+        // TODO Auto-generated method stub
+        
+    }
+    @Override
+    public void update(EmployeeDTO employeeDTO) {
+        // TODO Auto-generated method stub
+        Employee employee = new Employee();
+        BeanUtils.copyProperties(employeeDTO,employee);
+        
+
+        // employee.setUpdateTime(LocalDateTime.now());
+        // employee.setUpdateUser(BaseContext.getCurrentId());
+        employeeMapper.update(employee);
+    }
+    
 
 }

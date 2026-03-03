@@ -36,6 +36,8 @@ public class GlobalExceptionHandler {
             String value = msgg.split(" ")[2];
              full_tip = value + MessageConstant.ALREADY_EXISTS;
 
+        }else{
+            return Result.error(MessageConstant.UNKNOWN_ERROR);
         }
 
 
