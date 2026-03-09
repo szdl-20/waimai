@@ -1,7 +1,20 @@
 package com.sky.mapper;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+
+import com.github.pagehelper.Page;
+import com.sky.annotation.AutoFill;
+import com.sky.dto.SetmealPageQueryDTO;
+import com.sky.entity.Setmeal;
+import com.sky.entity.SetmealDish;
+import com.sky.enumeration.OperationType;
+import com.sky.vo.SetmealVO;
 
 // @Mapper
 // public interface SetmealMapper {
@@ -20,4 +33,20 @@ public interface SetmealMapper {
 
     @Select("select count(id) from setmeal where category_id=#{id}")
     Integer countByCategoryId(Long id);
+    @AutoFill( value = OperationType.UPDATE)
+    void update(Setmeal setmeal);
+
+    // void update(SetmealDish setmealDish);
+
+    @AutoFill( value = OperationType.INSERT)
+
+    void insert(Setmeal setMeal);
+
+    Page<SetmealVO> pageQuery(SetmealPageQueryDTO setmealPageQueryDTO);
+
+    void delete(List<Long> ids);
+    @Select("select * from setmeal where id = #{id}")
+    Setmeal getById( Long id);
+    
+
 }
