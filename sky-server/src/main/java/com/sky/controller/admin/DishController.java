@@ -18,7 +18,7 @@ import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
-import com.sky.service.DishServices;
+import com.sky.service.DishService;
 import com.sky.vo.DishVO;
 
 import io.swagger.annotations.Api;
@@ -37,7 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DishController {
     @Autowired
-    private DishServices DishServices;
+    private DishService DishServices;
 
 
     @PostMapping

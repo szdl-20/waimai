@@ -1,6 +1,7 @@
 package com.sky.service.impl;
 
 import java.beans.beancontext.BeanContext;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.BeanUtils;
@@ -23,7 +24,7 @@ import com.sky.mapper.DishFlavorMapper;
 import com.sky.mapper.DishMapper;
 import com.sky.mapper.SetmealDishMapper;
 import com.sky.result.PageResult;
-import com.sky.service.DishServices;
+import com.sky.service.DishService;
 import com.sky.vo.DishVO;
 
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 
-public class DishServiceImpl implements DishServices{
+public class DishServiceImpl implements DishService{
 
 
     @Autowired
@@ -141,6 +142,24 @@ public class DishServiceImpl implements DishServices{
     public void setDishStatus(Dish dish) {
         // TODO Auto-generated method stub
         dishMapper.update(dish);
+    }
+        public List<DishVO> listWithFlavor(Dish dish) {
+        List<Dish> dishList = dishMapper.get_by_fenlei_id(dish);
+
+        List<DishVO> dishVOList = new ArrayList<>();
+
+        for (Dish d : dishList) {
+            DishVO dishVO = new DishVO();
+            BeanUtils.copyProperties(d,dishVO);
+
+            //根据菜品id查询对应的口味
+            List<DishFlavor> flavors = dishFlavorMapper.get_by_dishId(d.getId());
+
+            dishVO.setFlavors(flavors);
+            dishVOList.add(dishVO);
+        }
+
+        return dishVOList;
     }
     
 }

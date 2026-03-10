@@ -8,7 +8,7 @@ import com.sky.entity.Dish;
 import com.sky.result.PageResult;
 import com.sky.vo.DishVO;
 
-public interface DishServices {
+public interface DishService {
     public void saveWithFlavor(DishDTO dishDTO);
 
     public PageResult pageQuey(DishPageQueryDTO dishPageQueryDTO);
@@ -24,4 +24,5 @@ public interface DishServices {
     public List<Dish> get_by_fenlei_id(Long categoryId);
 
     public void setDishStatus(Dish dish);
+    List<DishVO> listWithFlavor(Dish dish);
 }
