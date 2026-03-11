@@ -1,8 +1,10 @@
 package com.sky.controller.admin;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,6 +41,9 @@ public class DishController {
     @Autowired
     private DishService DishServices;
 
+    @Autowired
+    private RedisTemplate redisTemplate;
+
 
     @PostMapping
     @ApiOperation("添加菜品")
@@ -48,6 +53,8 @@ public class DishController {
         log.info("添加菜品:{}",dishDTO);
         
         DishServices.saveWithFlavor(dishDTO);
+        Long categoryId = dishDTO.getCategoryId();
+        clearCache("dish_" + categoryId);
 
         return Result.success();
     }
@@ -65,6 +72,8 @@ public class DishController {
         log.info("菜品批量删除{}",ids);
         DishServices.deleteBatch(ids);
 
+        clearCache("dish_*");
+
         return Result.success();
     }
     @GetMapping("/{id}")
@@ -81,6 +90,7 @@ public class DishController {
         log.info("当前修改菜品{}",dishDTO);
         
         DishServices.updateWithFlavor(dishDTO);
+        clearCache("dish_*");
 
         return Result.success();
     }
@@ -105,10 +115,17 @@ public class DishController {
             .status(status)
             .build();
         DishServices.setDishStatus(dish);
+        clearCache("dish_*");
 
 
 
         return Result.success();
+    }
+
+
+    private void clearCache(String pattern){
+        Set new_keys = redisTemplate.keys(pattern);
+        redisTemplate.delete(new_keys);
     }
     
 }
